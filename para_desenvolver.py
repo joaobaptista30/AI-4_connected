@@ -49,6 +49,7 @@ class Game4InLine:
 
         for i in range(4): #verify horizontal win
             
+            
             ...
 
         return False

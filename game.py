@@ -37,24 +37,73 @@ class Game4InLine:
             self.round+=1
             return self
 
-    def isFinished(self,col): #return 99 if game is a draw, True if last move was a winning on , False to keep playing
-        played=self.pieces[self.turn-1]
-        row=self.rows-self.placed[col]
-        if(self.round==(self.rows*self.cols)):
-            return 99
-        
-        if(self.placed[col]>=4): #verify for vertical win
+    def isFinished(self,col): #return 2 if game is a draw, True if last move was a winning on , False to keep playing
+        played = self.pieces[self.turn-1]
+        row = self.rows-self.placed[col]
+    
+        #Check Vertical
+        if(self.placed[col]>=4):
             if(self.board[row][col]==played and self.board[row+1][col]==played and self.board[row+2][col]==played and self.board[row+3][col]==played):
                 return True
 
-        for i in range(4): #verify horizontal win
-            
-            ...
+        # Check horizontal
+        consecutive = 1
+        tmpcol = col
+        while tmpcol+1 < self.cols and self.board[row][tmpcol+1] == played:
+            consecutive += 1
+            tmpcol += 1
+        tmpcol = col
+        while tmpcol-1 >= 0 and self.board[row][tmpcol-1] == played:
+            consecutive += 1
+            tmpcol -= 1
+
+        if consecutive >= 4:
+            return True
+
+        # Check diagonal right-left
+        consecutive = 1
+        tmprow = row
+        tmpcol = col
+        while tmprow+1 < self.rows and tmpcol+1 < self.cols and self.board[tmprow+1][tmpcol+1] == played:
+            consecutive += 1
+            tmprow += 1
+            tmpcol += 1
+        tmprow = row
+        tmpcol = col
+        while tmprow-1 >= 0 and tmpcol-1 >= 0 and self.board[tmprow-1][tmpcol-1] == played:
+            consecutive += 1
+            tmprow -= 1
+            tmpcol -= 1
+
+        if consecutive >= 4:
+            return True
+
+        # Check diagonal left-right
+        consecutive = 1
+        tmprow = row
+        tmpcol = col
+        while tmprow-1 >= 0 and tmpcol+1 < self.cols and self.board[tmprow-1][tmpcol+1] == played:
+            consecutive += 1
+            tmprow -= 1
+            tmpcol += 1
+        tmprow = row
+        tmpcol = col
+        while tmprow+1 < self.rows and tmpcol-1 >= 0 and self.board[tmprow+1][tmpcol-1] == played:
+            consecutive += 1
+            tmprow += 1
+            tmpcol -= 1
+
+        if consecutive >= 4:
+            return True
+
+        # Check for draw
+        if(self.round==(self.rows*self.cols)):
+            return 2
 
         return False
 
         
-
+    
     def __str__(self): #override the print() method
         return print_board(self.board)
 

@@ -116,20 +116,62 @@ class Game4InLine:
         return False
 
 
-    def heuristica(self,col):
-        points=0
-        row = self.rows-self.placed[col]
+    def heuristic(self,col):
+        points=0        
+        #horizontal
+        for i in range(self.rows):
+            for j in range(self.cols-3):
+                count_X=0
+                count_O=0
+                for h in range(j,j+4):
+                    if (self.board[i][h] == "X"):
+                        count_X+=1
+                    if (self.board[i][h] == "O"):
+                        count_O+=1
+
+                points+=getPoints(count_X,count_O)
         
         #vertical
-        for i in range (4):
-            count_X=0
-            count_O=0
-            tmprow=row
-            for
+        for i in range(self.cols):
+            for j in range(self.rows-3):
+                count_X=0
+                count_O=0                
+                for h in range(j,j+4):
+                    if (self.board[h][i] == "X"):
+                        count_X+=1
+                    if (self.board[h][i] == "O"):
+                        count_O+=1
 
+                points+=getPoints(count_X,count_O)
 
-        
+        #diagonal 1
+        for i in range(self.rows-3):
+            for j in range(self.cols-3):
+                count_X=0
+                count_O=0  
+                for h in range(4):
+                    if (self.board[i+h][j+h] == "X"):
+                        count_X+=1
+                    if (self.board[i+h][j+h] == "O"):
+                        count_O+=1
+
+                points+=getPoints(count_X,count_O)                    
+
+        #diagonal 2
+        for i in range(self.rows-3):
+            for j in range(3,self.cols):
+                count_X=0
+                count_O=0  
+                for h in range(4):
+                    if (self.board[i+h][j-h] == "X"):
+                        count_X+=1
+                    if (self.board[i+h][j-h] == "O"):
+                        count_O+=1
+
+                points+=getPoints(count_X,count_O)
+
         return points
+
 
     def A_star(self):
         
@@ -144,7 +186,25 @@ class Game4InLine:
         return print_board(self.board)
 
 
-
+def getPoints(x,o):
+    
+    if (x == 4 and o == 0):
+        return 512
+    if (x == 3 and o == 0):
+        return 50
+    if (x == 2 and o == 0):
+        return 10
+    if (x == 1 and o == 0):
+        return 1
+    if (x == 0 and o == 1):
+        return -1
+    if (x == 0 and o == 2):
+        return -10
+    if (x == 0 and o == 3):
+        return -50
+    if (x == 0 and o == 4):
+        return -512
+    return 0
 
 def print_board(board): #transform the game board from matrix to a visual representation
     board_str="|"

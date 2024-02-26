@@ -25,7 +25,14 @@ class Game4InLine:
 
 
     def childs(self):
-        childs=[]
+        # returns the possible moves
+        moves=self.legal_moves()
+        children = []
+
+        for col in moves:
+            children.append(deepcopy(self.play(col)))
+
+        return children
 
 
     def play(self,col:int): #funcion to place pieces based on turn and column
@@ -109,9 +116,25 @@ class Game4InLine:
         return False
 
 
-    def A_star():
+    def heuristica(self,col):
+        points=0
+        row = self.rows-self.placed[col]
         
+        #vertical
+        for i in range (4):
+            count_X=0
+            count_O=0
+            tmprow=row
+            for
 
+
+        
+        return points
+
+    def A_star(self):
+        
+        childs=self.childs()
+        legal=self.legal_moves()
 
 
         ...

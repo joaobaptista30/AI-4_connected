@@ -30,7 +30,8 @@ class Game4InLine:
         children = []
 
         for col in moves:
-            children.append(deepcopy(self.play(col)))
+            temp=deepcopy(self)
+            children.append([temp.play(col),col])
 
         return children
 
@@ -40,6 +41,7 @@ class Game4InLine:
         self.placed[col]+=1
         self.round+=1
         self.turn = 1 if self.turn%2==0 else 0 #change turn
+        return self
 
 
     def isFinished(self,col): #return 2 if game is a draw, True if last move was a winning one , False to keep playing
@@ -176,10 +178,10 @@ class Game4InLine:
     def A_star(self):
         
         childs=self.childs()
-        legal=self.legal_moves()
+        for i in range(7):
+            ...
 
 
-        ...
 
 
     def __str__(self): #override the print() method
@@ -214,7 +216,7 @@ def print_board(board): #transform the game board from matrix to a visual repres
     for i in range(len(board)):
         board_str += "| "
         for j in range(len(board[i])):
-            board_str+=board[i][j]
-            board_str += " | "
+            #board_str+=board[i][j]
+            board_str += f"{board[i][j]} | "
         board_str+="\n"
     return board_str

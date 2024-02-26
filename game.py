@@ -18,35 +18,26 @@ class Game4InLine:
 
 
     def play(self,col:int): #funcion to place pieces based on turn and column
-        
-        if self.turn%2==0: #Human  turn
-            self.board[self.rows-self.placed[col]-1][col]=self.pieces[self.turn]
-            self.placed[col]+=1
-            self.turn=1
-            self.round+=1
-            return self
-        
-        elif self.turn%2!=0: #AI turn
+        self.board[self.rows-self.placed[col]-1][col]=self.pieces[self.turn]
+        self.placed[col]+=1
+        self.round+=1
+        self.turn = 1 if self.turn%2==0 else 0 #change turn
 
-            if(self.placed[col]>=self.rows): #true when column is full
-                return None #este if faz mais sentido para criar as childs
-
-            self.board[self.rows-self.placed[col]-1][col]=self.pieces[self.turn]
-            self.placed[col]+=1
-            self.turn=0
-            self.round+=1
-            return self
-
-    def isFinished(self,col): #return 2 if game is a draw, True if last move was a winning on , False to keep playing
+    def isFinished(self,col): #return 2 if game is a draw, True if last move was a winning one , False to keep playing
         played = self.pieces[self.turn-1]
         row = self.rows-self.placed[col]
     
-        #Check Vertical
-        if(self.placed[col]>=4):
-            if(self.board[row][col]==played and self.board[row+1][col]==played and self.board[row+2][col]==played and self.board[row+3][col]==played):
-                return True
+        #Check Vertical    |
+        consecutive = 1  # |
+        tmprow = row     # |
+        while tmprow+1 < self.rows and self.board[tmprow+1][col] == played:
+            consecutive+=1
+            tmprow+=1
+        if consecutive >= 4:
+            return True
 
-        # Check horizontal
+
+        # Check horizontal  ----
         consecutive = 1
         tmpcol = col
         while tmpcol+1 < self.cols and self.board[row][tmpcol+1] == played:
@@ -56,14 +47,15 @@ class Game4InLine:
         while tmpcol-1 >= 0 and self.board[row][tmpcol-1] == played:
             consecutive += 1
             tmpcol -= 1
-
+        
         if consecutive >= 4:
             return True
 
-        # Check diagonal right-left
-        consecutive = 1
-        tmprow = row
-        tmpcol = col
+
+        # Check diagonal   1          \
+        consecutive = 1             #  \
+        tmprow = row                 #  \
+        tmpcol = col                  #  \
         while tmprow+1 < self.rows and tmpcol+1 < self.cols and self.board[tmprow+1][tmpcol+1] == played:
             consecutive += 1
             tmprow += 1
@@ -78,10 +70,11 @@ class Game4InLine:
         if consecutive >= 4:
             return True
 
-        # Check diagonal left-right
-        consecutive = 1
-        tmprow = row
-        tmpcol = col
+
+        # Check diagonal   2          /
+        consecutive = 1           #  /
+        tmprow = row             #  /
+        tmpcol = col            #  /
         while tmprow-1 >= 0 and tmpcol+1 < self.cols and self.board[tmprow-1][tmpcol+1] == played:
             consecutive += 1
             tmprow -= 1
@@ -96,12 +89,12 @@ class Game4InLine:
         if consecutive >= 4:
             return True
 
+
         # Check for draw
-        if(self.round==(self.rows*self.cols)):
+        if(self.round==(self.rows*self.cols)): #maybe change this to other function
             return 2
 
         return False
-
         
     
     def __str__(self): #override the print() method
@@ -117,7 +110,7 @@ def start_placed(cols): #start a list to record the num of piece per column
 
 def print_board(board): #transform the game board from matrix to a visual representation
     board_str="|"
-    for k in range(len(board[0])):
+    for k in range(1,len(board[0])+1):
         board_str+=f" {k} |"
     board_str+="\n"
     for i in range(len(board)):
@@ -131,6 +124,7 @@ def print_board(board): #transform the game board from matrix to a visual repres
 
 
 
+
 def main(): #loop for the game
     if BOARD_SIZE_STANDARD: game=Game4InLine(board=start_board(6,7),placed=start_placed(7))
 
@@ -138,27 +132,24 @@ def main(): #loop for the game
         r,c=map(int,input("Min board size: 5x5\nBoard size: (rows,cols) ").split())
         if(r<=4 or c<=4): game=Game4InLine(board=start_board(6,7),placed=start_placed(7))
         else: game=Game4InLine(board=start_board(r,c),placed=start_placed(c)) 
-
     print(game)
 
-    while True:
-        if(game.turn%2==0): print("player 1 ('X') turn")
-        else: print("player 2 ('O') turn")
 
-        column_played = int(input("Column to place: "))
-        if (column_played > game.cols-1 or column_played < 0):
-            print("Column out of range")
-            continue
-        elif game.placed[column_played] >= game.rows :
-            print("Column is full")
-            continue
-        else:
-            game.play(column_played)
-            print(game)
-            print(game.placed)
+    while True:        
+        print(f"player {game.turn%2 +1} ('{game.pieces[game.turn%2]}') turn")
+
+        column_played = int(input("Column to place: ")) - 1
+        while (column_played > game.cols-1 or column_played < 0) or game.placed[column_played] >= game.rows :
+            print("Impossible move")
+            column_played = int(input("Column to place: ")) - 1
+
+
+        game.play(column_played)
+        print(game)
+
         res=game.isFinished(column_played)
         if res:
-            if res==99:
+            if res==2:
                 print(f"Draw")
                 break
             else:
@@ -166,5 +157,7 @@ def main(): #loop for the game
                 break
 
         
+
 if __name__ == "__main__":
     main()
+

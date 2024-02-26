@@ -30,7 +30,7 @@ def main(): #loop for the game
 
         game.play(column_played)
         print(game)
-        print(game.heuristica(column_played))
+        print(game.heuristic(column_played))
 
         res=game.isFinished(column_played)
         if res:

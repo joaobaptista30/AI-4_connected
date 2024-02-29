@@ -118,17 +118,25 @@ class Game4InLine:
         return False
 
 
-    def heuristic_points(self,col):
-        points = 16 if self.pieces[self.turn] == 'X' else -16
+    def heuristic_path(game,col):
+        #completar com uma forma de calcular o "caminho" percorrido (nos slides esta heuristica é o g(n))
+        return 0
+
+
+    def heuristic_points(game,col):
+        '''
+
+        '''
+        points = 16 if game.pieces[game.turn] == 'X' else -16
         #horizontal
-        for i in range(self.rows):
-            for j in range(self.cols-3):
+        for i in range(game.rows):
+            for j in range(game.cols-3):
                 count_X=0
                 count_O=0
                 for h in range(j,j+4):
-                    if (self.board[i][h] == "X"):
+                    if (game.board[i][h] == "X"):
                         count_X+=1
-                    if (self.board[i][h] == "O"):
+                    if (game.board[i][h] == "O"):
                         count_O+=1
 
                 h_value = getPoints(count_X,count_O)
@@ -138,14 +146,14 @@ class Game4InLine:
                     points+=h_value
         
         #vertical
-        for i in range(self.cols):
-            for j in range(self.rows-3):
+        for i in range(game.cols):
+            for j in range(game.rows-3):
                 count_X=0
                 count_O=0                
                 for h in range(j,j+4):
-                    if (self.board[h][i] == "X"):
+                    if (game.board[h][i] == "X"):
                         count_X+=1
-                    if (self.board[h][i] == "O"):
+                    if (game.board[h][i] == "O"):
                         count_O+=1
 
                 h_value = getPoints(count_X,count_O)
@@ -155,14 +163,14 @@ class Game4InLine:
                     points+=h_value
 
         #diagonal 1
-        for i in range(self.rows-3):
-            for j in range(self.cols-3):
+        for i in range(game.rows-3):
+            for j in range(game.cols-3):
                 count_X=0
                 count_O=0  
                 for h in range(4):
-                    if (self.board[i+h][j+h] == "X"):
+                    if (game.board[i+h][j+h] == "X"):
                         count_X+=1
-                    if (self.board[i+h][j+h] == "O"):
+                    if (game.board[i+h][j+h] == "O"):
                         count_O+=1
 
                 h_value = getPoints(count_X,count_O)
@@ -172,14 +180,14 @@ class Game4InLine:
                     points+=h_value                    
 
         #diagonal 2
-        for i in range(self.rows-3):
-            for j in range(3,self.cols):
+        for i in range(game.rows-3):
+            for j in range(3,game.cols):
                 count_X=0
                 count_O=0  
                 for h in range(4):
-                    if (self.board[i+h][j-h] == "X"):
+                    if (game.board[i+h][j-h] == "X"):
                         count_X+=1
-                    if (self.board[i+h][j-h] == "O"):
+                    if (game.board[i+h][j-h] == "O"):
                         count_O+=1
 
                 h_value = getPoints(count_X,count_O)
@@ -191,19 +199,18 @@ class Game4InLine:
         return points
 
 
-    def A_star(self):
+    def A_star(self,heuristic):
         '''
         As in this project our A* only looks for its next best play without going in depht for a possible move from its the oponent
-        There is no need to have the cost of the path to the current state is it will be the same for all childs (it works more like a greedy shearch)
         We will use a list to store (heuristic(child),col) and sort it so the best play is first
-        A* will play as 'O' so the lower the score the better (due to our heuristic setup)
-        return the col of best play 
+        A* will play as 'O' so the lower the score the best (due to our heuristic setup)
+        return the col from best child 
         '''
         childs=self.childs()
         points_col=[]  #points_col[k][0] = points | points_col[k][1] = col
         for i in range(len(childs)):
             col=childs[i][1]
-            points_col.append([childs[i][0].heuristic_points(col),col])
+            points_col.append([heuristic(state=(childs[i][0]),col=col),col])
         points_col.sort() #lowest points first
 
         return (points_col[0][1])

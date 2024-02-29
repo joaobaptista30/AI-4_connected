@@ -9,6 +9,8 @@ def start_placed(cols): #start a list to record the num of piece per column
     return [0 for _ in range(cols)]
 
 
+
+
 def main(): #loop for the game
     if BOARD_SIZE_STANDARD: game=Game4InLine(board=start_board(6,7),placed=start_placed(7))
 
@@ -19,6 +21,9 @@ def main(): #loop for the game
     print(game)
 
 
+    Ai_playing = input("Play with AI [y\\n]: ")
+
+
     while True:        
         print(f"player {game.turn%2 +1} ('{game.pieces[game.turn%2]}') turn")
 
@@ -27,9 +32,27 @@ def main(): #loop for the game
             print("Impossible move")
             column_played = int(input("Column to place: ")) - 1
 
-
         game.play(column_played)
+        print(f"player {game.turn%2 +1}:")
         print(game)
+        
+
+        ''' temporary code to visualize heuristic and A* playing
+        print(game.heuristic_points(column_played))
+        print("Childs")
+        tmp=game.childs()
+        for i in range(len(tmp)):
+            print(f"{tmp[i][0]}\n{tmp[i][0].heuristic_points(tmp[i][1])}")
+        '''
+
+        #AI play
+        if Ai_playing == "y":
+            column_played=game.A_star()
+
+            game.play(column_played)
+            print("IA play:")
+            print(game)
+
 
         res=game.isFinished(column_played)
         if res:

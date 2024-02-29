@@ -118,8 +118,8 @@ class Game4InLine:
         return False
 
 
-    def heuristic(self,col):
-        points=0        
+    def heuristic_points(self,col):
+        points = 16 if self.pieces[self.turn] == 'X' else -16
         #horizontal
         for i in range(self.rows):
             for j in range(self.cols-3):
@@ -131,7 +131,11 @@ class Game4InLine:
                     if (self.board[i][h] == "O"):
                         count_O+=1
 
-                points+=getPoints(count_X,count_O)
+                h_value = getPoints(count_X,count_O)
+                if abs(h_value) == 512:
+                    return h_value
+                else:
+                    points+=h_value
         
         #vertical
         for i in range(self.cols):
@@ -144,7 +148,11 @@ class Game4InLine:
                     if (self.board[h][i] == "O"):
                         count_O+=1
 
-                points+=getPoints(count_X,count_O)
+                h_value = getPoints(count_X,count_O)
+                if abs(h_value) == 512:
+                    return h_value
+                else:
+                    points+=h_value
 
         #diagonal 1
         for i in range(self.rows-3):
@@ -157,7 +165,11 @@ class Game4InLine:
                     if (self.board[i+h][j+h] == "O"):
                         count_O+=1
 
-                points+=getPoints(count_X,count_O)                    
+                h_value = getPoints(count_X,count_O)
+                if abs(h_value) == 512:
+                    return h_value
+                else:
+                    points+=h_value                    
 
         #diagonal 2
         for i in range(self.rows-3):
@@ -170,18 +182,31 @@ class Game4InLine:
                     if (self.board[i+h][j-h] == "O"):
                         count_O+=1
 
-                points+=getPoints(count_X,count_O)
+                h_value = getPoints(count_X,count_O)
+                if abs(h_value) == 512:
+                    return h_value
+                else:
+                    points+=h_value
 
         return points
 
 
     def A_star(self):
-        
+        '''
+        As in this project our A* only looks for its next best play without going in depht for a possible move from its the oponent
+        There is no need to have the cost of the path to the current state is it will be the same for all childs (it works more like a greedy shearch)
+        We will use a list to store (heuristic(child),col) and sort it so the best play is first
+        A* will play as 'O' so the lower the score the better (due to our heuristic setup)
+        return the col of best play 
+        '''
         childs=self.childs()
-        for i in range(7):
-            ...
+        points_col=[]  #points_col[k][0] = points | points_col[k][1] = col
+        for i in range(len(childs)):
+            col=childs[i][1]
+            points_col.append([childs[i][0].heuristic_points(col),col])
+        points_col.sort() #lowest points first
 
-
+        return (points_col[0][1])
 
 
     def __str__(self): #override the print() method

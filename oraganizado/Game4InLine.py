@@ -157,19 +157,34 @@ class Game4InLine:
 
 
         #diagonal 1
+
+        #acabar as diagonais
+        tmpcol = col
+        tmprow = row
+        i=0
+        while(tmprow>0 and tmpcol>0 and i<=3):
+            tmpcol-=1
+            tmprow-=1
+            i+=1
+
+        '''
         for tmpcol in range(max(0,col-3),min(4,game.cols-col)):
             for tmprow in range(max(0,row-3),min(4,game.rows-row)):
-                count_X=0
-                count_O=0
-                for h in range(4):
-                    print(f"h: {h}\ntmpcol: {tmpcol+h}\n tmprow: {tmprow+h}")
-                    if (game.board[tmprow+h][tmpcol+h] == "X"):
-                        count_X+=1
-                    if (game.board[tmprow+h][tmpcol+h] == "O"):
-                        count_O+=1
+        '''
+        count_X=0
+        count_O=0
+        for h in range(4):
+            #print(f"h: {h}\ntmpcol: {tmpcol+h}\n tmprow: {tmprow+h}")
+            if (game.board[tmprow+h][tmpcol+h] == "X"):
+                count_X+=1
+            if (game.board[tmprow+h][tmpcol+h] == "O"):
+                count_O+=1
 
-                if(count_X==3 and count_O==1):
-                    return -510 
+        if(count_X==3 and count_O==1):
+            return -510 
+
+
+
 
         #diagonal 2
         for tmpcol in range(max(0,col-3),min(4,game.cols-col)):

@@ -119,7 +119,72 @@ class Game4InLine:
 
 
     def heuristic_path(game,col):
-        #completar com uma forma de calcular o "caminho" percorrido (nos slides esta heuristica é o g(n))
+        row = game.rows-game.placed[col]
+        print(f"col: {col}\n row: {row}")
+        #caso for uma jogada para ganhar
+        if game.isFinished(col):
+            return -512
+
+        #caso for uma jogada para nao perder
+        #horizontal
+        for i in range(max(0,col-3),col):
+            tpmcol = i
+            count_X=0
+            count_O=0
+            for j in range(i,min(4,game.cols-col)):
+                if (game.board[row][tpmcol+j] == "X"):
+                    count_X+=1
+                if (game.board[row][tpmcol+j] == "O"):
+                    count_O+=1
+            
+            #dar pontos
+            if(count_X==3 and count_O==1):
+                return -510
+
+
+        #vertical
+        count_X=0
+        count_O=0
+        for i in range(0,min(4,game.rows-row)):
+            if (game.board[row+i][col] == "X"):
+                count_X+=1
+            if (game.board[row+i][col] == "O"):
+                count_O+=1
+
+        #dar pontos
+        if(count_X==3 and count_O==1):
+            return -510                
+
+
+        #diagonal 1
+        for tmpcol in range(max(0,col-3),min(4,game.cols-col)):
+            for tmprow in range(max(0,row-3),min(4,game.rows-row)):
+                count_X=0
+                count_O=0
+                for h in range(4):
+                    print(f"h: {h}\ntmpcol: {tmpcol+h}\n tmprow: {tmprow+h}")
+                    if (game.board[tmprow+h][tmpcol+h] == "X"):
+                        count_X+=1
+                    if (game.board[tmprow+h][tmpcol+h] == "O"):
+                        count_O+=1
+
+                if(count_X==3 and count_O==1):
+                    return -510 
+
+        #diagonal 2
+        for tmpcol in range(max(0,col-3),min(4,game.cols-col)):
+            for tmprow in range(min(game.rows,row-3),max(0,row-3)):
+                count_X=0
+                count_O=0
+                for h in range(4):
+                    if (game.board[tmprow-h][tmpcol+h] == "X"):
+                        count_X+=1
+                    if (game.board[tmprow-h][tmpcol+h] == "O"):
+                        count_O+=1
+
+                if(count_X==3 and count_O==1):
+                    return -510 
+
         return 0
 
 

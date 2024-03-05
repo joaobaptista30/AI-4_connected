@@ -119,15 +119,15 @@ class Game4InLine:
 
 
     def heuristic_path(game,col):
-    
         row = game.rows-game.placed[col]
+    
         #caso for uma jogada para ganhar
         if game.isFinished(col):
             return -512
 
 
         #caso for uma jogada para nao perder
-        
+        points=0
         #horizontal
         for i in range(max(0,col-3),col):
             tpmcol = i
@@ -142,6 +142,8 @@ class Game4InLine:
             #dar pontos
             if(count_X==3 and count_O==1):
                 return -510
+            if(count_X==2 and count_O==1):
+                points = -100
        
 
         #vertical
@@ -155,12 +157,13 @@ class Game4InLine:
 
         #dar pontos
         if(count_X==3 and count_O==1):
-            return -510                
+            return -510
+        if(count_X==2 and count_O==1):
+            points = -100                
       
        
 
         #diagonal 1
-                            #ja esta funcional
         tmpcol = col
         tmprow = row
         i=0
@@ -180,6 +183,8 @@ class Game4InLine:
 
             if(count_X==3 and count_O==1):
                 return -510 
+            if(count_X==2 and count_O==1):
+                points = -100  
             
             tmpcol+=1
             tmprow+=1
@@ -188,9 +193,6 @@ class Game4InLine:
         #diagonal 2
         tmpcol = col
         tmprow = row
-        print(tmprow)
-        print(row)
-        print(game.rows)
         i=0
         while i<3 and tmprow<game.rows-1 and tmpcol>0:
             tmpcol-=1
@@ -209,12 +211,14 @@ class Game4InLine:
 
             if(count_X==3 and count_O==1):
                 return -510
+            if(count_X==2 and count_O==1):
+                points = -100  
 
             tmpcol+=1
             tmprow-=1 
     
 
-        return 0
+        return points
 
 
     def heuristic_points(game,col):
@@ -302,10 +306,18 @@ class Game4InLine:
         '''
         childs=self.childs()
         points_col=[]  #points_col[k][0] = points | points_col[k][1] = col
+        a=[] #eliminar depois de debugg
         for i in range(len(childs)):
             col=childs[i][1]
             points_col.append([heuristic(state=(childs[i][0]),col=col),col])
+            a.append([Game4InLine.heuristic_points((childs[i][0]),col),Game4InLine.heuristic_path((childs[i][0]),col),col])#eliminar depois de debugg
+
         points_col.sort() #lowest points first
+
+        #eliminar depois de debugg
+        print(f"pontos A*: {points_col}")
+        print(f"escolha A*: {(points_col[0][1])+1}")
+        print(f"h_dada, h_path, col:\n{a}")
 
         return (points_col[0][1])
 

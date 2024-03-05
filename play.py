@@ -44,9 +44,8 @@ def main(): #func for the game
             print("Impossible move")
             column_played = int(input("Column to place: ")) - 1
 
-        print(f"player {game.turn%2 +1}:")
         game.play(column_played)
-        print(game)
+        print(f"Board:\n{game}")
         
         
         if result(game,column_played):
@@ -56,11 +55,10 @@ def main(): #func for the game
         #AI play
         if Ai_playing == "y":
             column_played=game.A_star(lambda state,col: G4Line.heuristic_points(state,col)+ G4Line.heuristic_path(state,col))
-
-
             game.play(column_played)
-            print("IA play:")
-            print(game)
+
+            print(f"AI play: {column_played}")
+            print(f"Board:\n{game}")
 
 
         if result(game,column_played):

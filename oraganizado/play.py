@@ -20,7 +20,7 @@ def result(game,col):
 
 
 
-def main(): #loop for the game
+def main(): #func for the game
     #in case user decides to play with a different board size from 6x7
     if BOARD_SIZE_STANDARD: game=G4Line(board=start_board(6,7),placed=start_placed(7))
     else: 
@@ -29,12 +29,13 @@ def main(): #loop for the game
         else: game=G4Line(board=start_board(r,c),placed=start_placed(c)) 
     print(game)
     
-    #if user want to play vs AI (and which AI)
+    #if user want to play vs AI (and which AI, when MCTS is implemented)
     Ai_playing = input("Play with AI [y\\n]: ")
     while Ai_playing!='y' and Ai_playing!='n':
         Ai_playing = input(f"Invalid choice\nPlay with AI [y\\n]: ")
 
 
+    #main loop
     while True:        
         print(f"player {game.turn%2 +1} ('{game.pieces[game.turn%2]}') turn")
 
@@ -46,6 +47,7 @@ def main(): #loop for the game
         game.play(column_played)
         print(f"player {game.turn%2 +1}:")
         print(game)
+        
         
         if result(game,column_played):
             break
@@ -65,6 +67,7 @@ def main(): #loop for the game
             game.play(column_played)
             print("IA play:")
             print(game)
+
 
         if result(game,column_played):
             break

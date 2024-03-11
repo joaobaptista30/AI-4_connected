@@ -123,7 +123,7 @@ class Game4InLine:
     
         #caso for uma jogada para ganhar
         if game.isFinished(col):
-            return -512
+            return -512 if game.turn%2==0 else 512
 
 
         #caso for uma jogada para nao perder
@@ -140,10 +140,12 @@ class Game4InLine:
                     count_O+=1
             
             #dar pontos
-            if(count_X==3 and count_O==1):
-                return -500
-            if(count_X==2 and count_O==1):
-                points = -100
+            h_value = getPoints_path(count_X,count_O)
+            if abs(h_value) == 500:
+                return -500 if game.turn%2==0 else 500
+            elif h_value != 0:
+                points=h_value
+            
        
 
         #vertical
@@ -156,10 +158,11 @@ class Game4InLine:
                 count_O+=1
 
         #dar pontos
-        if(count_X==3 and count_O==1):
-            return -500
-        if(count_X==2 and count_O==1):
-            points = -100                
+        h_value = getPoints_path(count_X,count_O)
+        if abs(h_value) == 500:
+            return -500 if game.turn%2==0 else 500
+        elif h_value != 0:
+            points=h_value              
       
        
 
@@ -181,10 +184,11 @@ class Game4InLine:
                 if (game.board[tmprow+h][tmpcol+h] == "O"):
                     count_O+=1
 
-            if(count_X==3 and count_O==1):
-                return -500 
-            if(count_X==2 and count_O==1):
-                points = -100  
+            h_value = getPoints_path(count_X,count_O)
+            if abs(h_value) == 500:
+                return -500 if game.turn%2==0 else 500
+            elif h_value != 0:
+                points=h_value
             
             tmpcol+=1
             tmprow+=1
@@ -209,16 +213,17 @@ class Game4InLine:
                 if (game.board[tmprow-h][tmpcol+h] == "O"):
                     count_O+=1
 
-            if(count_X==3 and count_O==1):
-                return -500
-            if(count_X==2 and count_O==1):
-                points = -100  
+            h_value = getPoints_path(count_X,count_O)
+            if abs(h_value) == 500:
+                return -500 if game.turn%2==0 else 500
+            elif h_value != 0:
+                points=h_value 
 
             tmpcol+=1
             tmprow-=1 
     
 
-        return points
+        return abs(points)*(-1) if game.turn%2==0 else abs(points)
 
 
     def heuristic_points(game,col):
@@ -306,11 +311,11 @@ class Game4InLine:
         '''
         childs=self.childs()
         points_col=[]  #points_col[k][0] = points | points_col[k][1] = col
-        #a=[] #eliminar depois de debugg
+        a=[] #eliminar depois de debugg
         for i in range(len(childs)):
             col=childs[i][1]
             points_col.append([heuristic(state=(childs[i][0]),col=col),col])
-            #a.append([Game4InLine.heuristic_points((childs[i][0]),col),Game4InLine.heuristic_path((childs[i][0]),col),col]) #eliminar depois de debugg
+            a.append([Game4InLine.heuristic_points((childs[i][0]),col),Game4InLine.heuristic_path((childs[i][0]),col),col]) #eliminar depois de debugg
 
         points_col.sort() #lowest points first
 
@@ -318,8 +323,8 @@ class Game4InLine:
         #eliminar depois de debugg
         print(f"pontos A*: {points_col}")
         print(f"escolha A*: {(points_col[0][1])+1}")
-        print(f"h_dada, h_path, col:\n{a}")
         '''
+        print(f"h_dada, h_path, col:\n{a}")
 
         return (points_col[0][1])
 
@@ -347,6 +352,18 @@ def getPoints(x,o):
     if (x == 0 and o == 4):
         return -512
     return 0
+
+def getPoints_path(x,o):
+    if(x==3 and o==1):
+        return -500
+    if(x==2 and o==1):
+        return -100  
+    if(x==1 and o==3):
+        return 500
+    if(x==1 and o==2):
+        return 100 
+    return 0
+
 
 def print_board(board): #transform the game board from matrix to a visual representation
     board_str="|"

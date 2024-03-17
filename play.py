@@ -1,6 +1,6 @@
 from Game4InLine import Game4InLine as G4Line
 
-BOARD_SIZE_STANDARD=True #make it 'False' if u want to play 4InLine with a board diff from 6x7
+BOARD_SIZE_STANDARD = True #make it 'False' if u want to play 4InLine with a board diff from 6x7
 
 def start_board(rows, cols): #start the board with '-' for all entrances
     return [['-' for _ in range(cols)] for _ in range(rows)]
@@ -63,23 +63,6 @@ def main(): #func for the game
 
         if result(game,column_played):
             break
-
-
-''' def para jogar A* vs A*
-def main():
-    game=G4Line(board=start_board(6,7),placed=start_placed(7))
-
-    while True: 
-        print(f"player {game.turn%2 +1} ('{game.pieces[game.turn%2]}') turn")
-        column_played=game.A_star(lambda state,col: G4Line.heuristic_points(state,col)+ G4Line.heuristic_path(state,col))
-        game.play(column_played)
-        print(f"AI play: {column_played+1}")
-
-        print(game)
-
-        if result(game,column_played):
-            break
-'''
 
 
 if __name__ == "__main__":

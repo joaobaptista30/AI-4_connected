@@ -326,7 +326,7 @@ class Game4InLine:
         '''
         print(f"h_dada, h_path, col:\n{a}")
 
-        return (points_col[0][1])
+        return (points_col[0][1]) if self.pieces[self.turn] == 'O' else (points_col[-1][1])
 
 
     def __str__(self): #override the print() method

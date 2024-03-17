@@ -305,7 +305,7 @@ class Game4InLine:
     def A_star(self,heuristic):
         '''
         As in this project our A* only looks for its next best play without going in depht for a possible move from its the oponent
-        We will use a list to store (heuristic(child),col) and sort it so the best play is first
+        We will use a list to store (heuristic(child),col) and sort it so the best play for 'O' is first and for 'X' is last
         A* will play as 'O' so the lower the score the best (due to our heuristic setup)
         return the col from best child 
         '''
@@ -315,15 +315,12 @@ class Game4InLine:
         for i in range(len(childs)):
             col=childs[i][1]
             points_col.append([heuristic(state=(childs[i][0]),col=col),col])
-            a.append([Game4InLine.heuristic_points((childs[i][0]),col),Game4InLine.heuristic_path((childs[i][0]),col),col]) #eliminar depois de debugg
+            #para visualizar pontuacao de cada heuristica
+            a.append([Game4InLine.heuristic_points((childs[i][0]),col),Game4InLine.heuristic_path((childs[i][0]),col),col+1]) #eliminar depois de debugg
 
         points_col.sort() #lowest points first
 
-        ''' 
-        #eliminar depois de debugg
-        print(f"pontos A*: {points_col}")
-        print(f"escolha A*: {(points_col[0][1])+1}")
-        '''
+        #para visualizar pontuacao de cada heuristica
         print(f"h_dada, h_path, col:\n{a}")
 
         return (points_col[0][1]) if self.pieces[self.turn] == 'O' else (points_col[-1][1])
@@ -331,6 +328,10 @@ class Game4InLine:
 
     def __str__(self): #override the print() method
         return print_board(self.board)
+
+
+
+
 
 
 def getPoints(x,o):

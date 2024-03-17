@@ -2,11 +2,6 @@ from Game4InLine import Game4InLine as G4Line
 
 BOARD_SIZE_STANDARD = True #make it 'False' if u want to play 4InLine with a board diff from 6x7
 
-def start_board(rows, cols): #start the board with '-' for all entrances
-    return [['-' for _ in range(cols)] for _ in range(rows)]
-
-def start_placed(cols): #start a list to record the num of piece per column
-    return [0 for _ in range(cols)]
 
 def result(game,col):
     res=game.isFinished(col)
@@ -22,11 +17,11 @@ def result(game,col):
 
 def main(): #func for the game
     #in case user decides to play with a different board size from 6x7
-    if BOARD_SIZE_STANDARD: game=G4Line(board=start_board(6,7),placed=start_placed(7))
+    if BOARD_SIZE_STANDARD: game=G4Line(6,7)
     else: 
         r,c=map(int,input("Min board size: 5x5\nBoard size: (rows,cols) ").split())
-        if(r<=4 or c<=4): game=G4Line(board=start_board(6,7),placed=start_placed(7))
-        else: game=G4Line(board=start_board(r,c),placed=start_placed(c)) 
+        if(r<=4 or c<=4): game=G4Line(6,7)
+        else: game=G4Line(r,c) 
     print(game)
     
     #if user want to play vs AI (and which AI, when MCTS is implemented)
@@ -63,6 +58,8 @@ def main(): #func for the game
 
         if result(game,column_played):
             break
+
+
 
 
 if __name__ == "__main__":

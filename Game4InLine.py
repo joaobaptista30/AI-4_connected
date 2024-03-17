@@ -4,11 +4,11 @@ from copy import deepcopy
 #AI go second and uses 'O' (player 2)
 
 class Game4InLine:
-    def __init__ (self,board,placed):
-        self.rows = len(board)
-        self.cols = len(board[0])
-        self.board = deepcopy(board) #matrix representing the board
-        self.placed = deepcopy(placed) #store the num of pieces per column
+    def __init__ (self,row,col):
+        self.rows = row
+        self.cols = col
+        self.board = [['-' for _ in range(col)] for _ in range(row)] #matrix representing the board
+        self.placed = [0 for _ in range(col)] #store the num of pieces per column
         self.pieces = ['X','O']
         self.turn = 0
         self.round = 0
@@ -328,9 +328,6 @@ class Game4InLine:
 
     def __str__(self): #override the print() method
         return print_board(self.board)
-
-
-
 
 
 

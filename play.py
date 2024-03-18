@@ -1,7 +1,8 @@
 from Game4InLine import Game4InLine as G4Line
+from MCTS import MCTS
 
 BOARD_SIZE_STANDARD = True #make it 'False' if u want to play 4InLine with a board diff from 6x7
-
+TIME_MCTS = 5 #time for search with mcts
 
 def result(game,col):
     res=game.isFinished(col)
@@ -29,6 +30,13 @@ def main(): #func for the game
     while Ai_playing!='y' and Ai_playing!='n':
         Ai_playing = input(f"Invalid choice\nPlay with AI [y\\n]: ")
 
+    which_AI = 0
+    if Ai_playing == "y":
+      which_AI = int(input("A*: 1\nMCTS: 2\nChoose: "))
+    while which_AI != 1 and which_AI != 2:
+        which_AI = int(input("Invalid choice\nA*: 1\nMCTS: 2\nChoose: "))
+    print("")
+
 
     #main loop
     while True:        
@@ -48,16 +56,27 @@ def main(): #func for the game
 
 
         #AI play
-        if Ai_playing == "y":
+        if which_AI == 1: #A*
             column_played=game.A_star(lambda state,col: G4Line.heuristic_points(state,col)+ G4Line.heuristic_path(state,col))
             game.play(column_played)
 
             print(f"AI play: {column_played+1}")
             print(f"Board:\n{game}")
 
+        elif which_AI == 2: #MCTS
+            tree = MCTS(game)
+            tree.search(TIME_MCTS) 
+            column_played = tree.best_move()
+            n_rolls,run_time = tree.statistic()
 
-        if result(game,column_played):
-            break
+            game.play(column_played)
+            print(f"AI play: {column_played+1}")
+            print(f"Num rolls = {n_rolls} em {run_time:.5f}seg")
+            print(game)
+
+        if Ai_playing == 'y':
+            if result(game,column_played):
+                break
 
 
 

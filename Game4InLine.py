@@ -46,7 +46,7 @@ class Game4InLine:
 
     def isFinished(self,col): #return 2 if game is a draw, True if last move was a winning one , False to keep playing
         played = self.pieces[self.turn-1]
-        row = self.rows-self.placed[col]
+        row = self.rows - max(self.placed[col],1)
     
         #Check Vertical    |
         consecutive = 1  # |

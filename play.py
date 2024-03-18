@@ -1,3 +1,4 @@
+import time
 from Game4InLine import Game4InLine as G4Line
 from MCTS import MCTS
 
@@ -82,6 +83,29 @@ def main(): #func for the game
 
 
 
+def main_mcts():
+    start_time = time.time()
+    game=G4Line(6,7)
+    #main loop
+    while True:        
+        print(f"player {game.turn%2 +1} ('{game.pieces[game.turn%2]}') turn")
+        
+        #AI play 
+        tree = MCTS(game)
+        tree.search(TIME_MCTS) 
+        column_played = tree.best_move()
+        n_simulations, run_time= tree.statistic()
+
+        game.play(column_played)
+        print(f"AI play: {column_played+1}")
+        print(f"Num simulations = {n_simulations} in {run_time:.5f}seg")
+        print(game)
+
+        if result(game,column_played):
+            break
+
+    print(f"game took {time.time()-start_time} seg")
+
 
 if __name__ == "__main__":
-    main()
+    main_mcts()

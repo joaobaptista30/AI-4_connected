@@ -32,14 +32,15 @@ def main(): #func for the game
 
     which_AI = 0
     if Ai_playing == "y":
-      which_AI = int(input("A*: 1\nMCTS: 2\nChoose: "))
+      which_AI = int(input("A*: 1\nMCTS: 2\nChoose (1 or 2): "))
     while which_AI != 1 and which_AI != 2:
-        which_AI = int(input("Invalid choice\nA*: 1\nMCTS: 2\nChoose: "))
+        which_AI = int(input("Invalid choice\nA*: 1\nMCTS: 2\nChoose (1 or 2): "))
     print("")
 
 
     #main loop
-    while True:        
+    while True: 
+        #Human play       
         print(f"player {game.turn%2 +1} ('{game.pieces[game.turn%2]}') turn")
 
         column_played = int(input("Column to place: ")) - 1
@@ -63,15 +64,16 @@ def main(): #func for the game
             print(f"AI play: {column_played+1}")
             print(f"Board:\n{game}")
 
+
         elif which_AI == 2: #MCTS
             tree = MCTS(game)
             tree.search(TIME_MCTS) 
             column_played = tree.best_move()
-            n_rolls,run_time = tree.statistic()
+            n_simulations, run_time = tree.statistic()
 
             game.play(column_played)
             print(f"AI play: {column_played+1}")
-            print(f"Num rolls = {n_rolls} em {run_time:.5f}seg")
+            print(f"Num simulations = {n_simulations} in {run_time:.5f}seg")
             print(game)
 
         if Ai_playing == 'y':

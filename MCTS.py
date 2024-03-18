@@ -39,21 +39,21 @@ class MCTS:
     def __init__(self, root: G4):
         self.root=Node(deepcopy(root))
         self.run_time = 0
-        self.num_rollouts = 0
+        self.simulations = 0
     
 
-    def search(self, time_limit, rolls=20000):
+    def search(self, time_limit, limit_simulations=22500):
         start_time = time.time()
-        num_rollouts = 0
-        while time.time() - start_time < time_limit and num_rollouts < rolls:
+        simulations = 0
+        while time.time() - start_time < time_limit and simulations < limit_simulations:
             node = self.selection()
             result = self.simulate(deepcopy(node.game))
             self.back_propagate(node,result)
-            num_rollouts += 1
+            simulations += 1
 
 
         self.run_time = time.time() - start_time
-        self.num_rollouts = num_rollouts
+        self.simulations = simulations
 
 
     def selection(self):
@@ -105,8 +105,16 @@ class MCTS:
 
         max_ucb = self.root.max_UCB()
         max_nodes = [n for n in (self.root.childs) if n[0].UCB1() == max_ucb]
+
+        for n in self.root.childs: #=========== analisar os UCB1 das childs da root
+            print(n[0].UCB1(),n[1]+1)
+
+        print("\nmax ")
+        print(max_nodes, max_ucb) #================== analisar se selecionou a melhor child corretamente
+
+
         best_child = random.choice(max_nodes)
         return best_child[1]
     
     def statistic(self):
-        return self.num_rollouts, self.run_time
+        return self.simulations, self.run_time

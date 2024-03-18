@@ -32,9 +32,9 @@ def main(): #func for the game
 
     which_AI = 0
     if Ai_playing == "y":
-      which_AI = int(input("A*: 1\nMCTS: 2\nChoose (1 or 2): "))
+      which_AI = int(input("A*: 1    MCTS: 2\nChoose (1 or 2): "))
     while which_AI != 1 and which_AI != 2:
-        which_AI = int(input("Invalid choice\nA*: 1\nMCTS: 2\nChoose (1 or 2): "))
+        which_AI = int(input("Invalid choice\nA*: 1    MCTS: 2\nChoose (1 or 2): "))
     print("")
 
 

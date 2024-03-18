@@ -55,7 +55,7 @@ def main(): #func for the game
         if result(game,column_played):
             break
 
-
+        print(game.placed)
         #AI play
         if which_AI == 1: #A*
             column_played=game.A_star(lambda state,col: G4Line.heuristic_points(state,col)+ G4Line.heuristic_path(state,col))
@@ -69,7 +69,7 @@ def main(): #func for the game
             tree = MCTS(game)
             tree.search(TIME_MCTS) 
             column_played = tree.best_move()
-            n_simulations, run_time = tree.statistic()
+            n_simulations, run_time= tree.statistic()
 
             game.play(column_played)
             print(f"AI play: {column_played+1}")

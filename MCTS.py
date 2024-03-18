@@ -25,7 +25,7 @@ class Node:
         if self.visited == 0:
             return float('inf')
 
-        return (self.wins/self.visited) + math.sqrt(2*math.log(self.parent.visited)/self.visited)
+        return (self.wins/self.visited) + math.sqrt(2) * math.sqrt(2*math.log(self.parent.visited)/self.visited)
 
     def max_UCB(self):
         max_val = (self.childs[0][0]).UCB1()
@@ -89,32 +89,38 @@ class MCTS:
             node_state.play(col)
             res = node_state.isFinished(col)
             if res:
-                return res if res == 2 else 1 if node_state.turn%2==0 else 0 #retorna na vez de quem jogou em ultimo
+                return res if res == 2 else 0 if node_state.turn%2==0 else 1 #retorna na vez de quem jogou em ultimo
 
-    def back_propagate(self, node: Node, result):
-        reward = 0 #considerar que perdeu/ou/empatou
-        if result == self.root.game.turn: #caso tenha ganho
-            reward = 1
-
+    def back_propagate(self, node: Node, result):        
+        #result = 2 se empatou, =1 se 'X' ganhou e =0 se 'O' ganhou
+        #logo quando result == node.game.turn vai dar reward 1 pois foi o jogador que ganhou a simulacao
         while node != None:
+            if result == node.game.turn: #caso seja o turno do jogar que ganhou na simulacao 
+                reward = 1
+            else: reward = 0
             node.visited += 1
             node.wins += reward
             node = node.parent
 
+
     def best_move(self):
+        childs = self.root.childs
+        print(childs) #====================
+        node = childs[0][0]
+        best_col = childs[0][1]
+        max_win_rate = node.wins/node.visited
+        print(f"win: {node.wins}\nvisited: {node.visited}")
+        print(f"win/visited: {max_win_rate} col: {best_col+1}")
 
-        max_ucb = self.root.max_UCB()
-        max_nodes = [n for n in (self.root.childs) if n[0].UCB1() == max_ucb]
-
-        for n in self.root.childs: #=========== analisar os UCB1 das childs da root
-            print(n[0].UCB1(),n[1]+1)
-
-        print("\nmax ")
-        print(max_nodes, max_ucb) #================== analisar se selecionou a melhor child corretamente
-
-
-        best_child = random.choice(max_nodes)
-        return best_child[1]
+        for i in range (1,len(childs)):
+            node = childs[i][0]
+            print(f"win: {node.wins}\nvisited: {node.visited}")
+            print(f"win/visited: {node.wins/node.visited} col: {childs[i][1]+1}")
+            if max_win_rate < (node.wins/node.visited):
+                max_win_rate = (node.wins/node.visited)
+            
+                best_col = childs[i][1]
+        return best_col
     
     def statistic(self):
         return self.simulations, self.run_time

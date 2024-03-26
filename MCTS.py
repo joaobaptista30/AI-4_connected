@@ -72,8 +72,8 @@ class MCTS:
         start_time = time.time()
         simulations = 0
         while time.time() - start_time < time_limit and simulations < limit_simulations:
-            node = self.selection()
-            result = self.simulate(deepcopy(node.game))
+            node, col = self.selection()
+            result = self.simulate(deepcopy(node.game),col)
             self.back_propagate(node,result)
             simulations += 1
 
@@ -99,13 +99,14 @@ class MCTS:
             col_child = best_child[1]
 
             if node.visited == 0:
-                return node
+                return node, col_child
             
         if self.expand(node,col_child):
             random_child = random.choice(node.childs)
             node = random_child[0]
+            col_child = random_child[1]
 
-        return node
+        return node, col_child
 
     def expand(self, node: Node, col: int):
         '''
@@ -118,11 +119,15 @@ class MCTS:
         node.set_childs()
         return True
 
-    def simulate(self, node_state: G4):
+    def simulate(self, node_state: G4, last_played: int):
         '''
         randomly select a valid column to play and repeats until the game is over
         return 0 if the game is lose or draw and 1 if win, based on the last piece played
         '''
+        res = node_state.isFinished(last_played) #in case the node given is already finished
+        if res:
+            return res if res == 2 else 0 if node_state.turn%2==0 else 1
+
         while True:
             col = random.choice(node_state.legal_moves())
             node_state.play(col)
@@ -154,6 +159,8 @@ class MCTS:
         we also print the win_rate for each child to visualize the data and the choise made from the algoritm
         '''
         childs = self.root.childs
+        if len(childs)==0:
+            return random.choice(self.root.game.legal_moves())
         node = childs[0][0]
         best_col = childs[0][1]
         max_win_rate = node.wins/node.visited
@@ -165,8 +172,8 @@ class MCTS:
             print(f"win/visited: {max_win_rate_temp:.4f} col: {childs[i][1]+1}")
             if max_win_rate < max_win_rate_temp:
                 max_win_rate = max_win_rate_temp
-            
                 best_col = childs[i][1]
+
         return best_col
     
     def statistic(self):

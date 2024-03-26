@@ -7,8 +7,14 @@ from Game4InLine import Game4InLine as G4
 
 
 class Node:
-
+    '''
+    class that defines the nodes for the MCTS tree
+    '''
     def __init__(self, game: G4, parent=None):
+        '''
+        game is the game state, parent is the father node
+        childs is started as empty so that we can differenciate from an explored node or no
+        '''
         self.game=deepcopy(game)
         self.parent=parent
         self.visited=0
@@ -16,18 +22,30 @@ class Node:
         self.childs = [] # formato [[node,col]]
 
     def set_childs(self):
+        '''
+        set the childs for the node based on the legal_moves from the state os the board
+        appends a list to the list with the format ->  [child_node, col]
+        child_node is the possible game state from the current node made by playing the column -> col 
+        '''
         poss_moves = self.game.legal_moves()
         for col in poss_moves:
             state = deepcopy(self.game)
             self.childs.append([Node(state.play(col), parent=self),col])
 
     def UCB1(self):
+        '''
+        funcion that calculates the UCB1 for the node 
+        '''
         if self.visited == 0:
             return float('inf')
 
-        return (self.wins/self.visited) + math.sqrt(2) * math.sqrt(2*math.log(self.parent.visited)/self.visited)
+        return ((self.wins/self.visited) + math.sqrt(2) * math.sqrt(2*math.log(self.parent.visited)/self.visited))
 
     def max_UCB(self):
+        '''
+        return the max UCB1 from the childs of the node
+        used to know the best nodes at the explore/selection phase
+        '''
         max_val = (self.childs[0][0]).UCB1()
         for i in range (1,len(self.childs)):
             max_val = max(max_val, (self.childs[i][0]).UCB1())
@@ -35,6 +53,9 @@ class Node:
 
 
 class MCTS:
+    '''
+    class that defines a tree for MCTS
+    '''
 
     def __init__(self, root: G4):
         self.root=Node(deepcopy(root))
@@ -43,6 +64,11 @@ class MCTS:
     
 
     def search(self, time_limit, limit_simulations=22500):
+        '''
+        main function to execute the MCTS
+        based on multiple tests, we found that MCTS works better with 5 seconds limit or 22500 iterations
+        so we end the search when one of this conditions are broken
+        '''
         start_time = time.time()
         simulations = 0
         while time.time() - start_time < time_limit and simulations < limit_simulations:
@@ -57,8 +83,13 @@ class MCTS:
 
 
     def selection(self):
+        '''
+        we start on root node and will go to the childs of the node and select the best case to expand/simulate based on the UCB1 given
+        and we repeat until we reach a leaf or the node as not been visited
+        if we can expand the node we select randomly from a childs
+        '''
         node = self.root
-        col_child = 0 # necessario devido a forma de verificar se chegamos ao estado final
+        col_child = 0 # needed due to who we set up the isFinished() funcion used in expand()
 
         while len(node.childs) != 0:
             max_ucb = node.max_UCB()
@@ -77,6 +108,10 @@ class MCTS:
         return node
 
     def expand(self, node: Node, col: int):
+        '''
+        returns False if the game is over or True after we add childs
+        if node is not a end for the game we add the childs
+        '''
         if node.game.isFinished(col):
             return False
         
@@ -84,18 +119,28 @@ class MCTS:
         return True
 
     def simulate(self, node_state: G4):
+        '''
+        randomly select a valid column to play and repeats until the game is over
+        return 0 if the game is lose or draw and 1 if win, based on the last piece played
+        '''
         while True:
             col = random.choice(node_state.legal_moves())
             node_state.play(col)
             res = node_state.isFinished(col)
             if res:
-                return res if res == 2 else 0 if node_state.turn%2==0 else 1 #retorna na vez de quem jogou em ultimo
+                return res if res == 2 else 0 if node_state.turn%2==0 else 1
 
-    def back_propagate(self, node: Node, result):        
-        #result = 2 se empatou, =1 se 'X' ganhou e =0 se 'O' ganhou
-        #logo quando result == node.game.turn vai dar reward 1 pois foi o jogador que ganhou a simulacao
+    def back_propagate(self, node: Node, result):
+        '''
+        we go from the given node to the root of the tree and do the respective alterations to the data
+        when player 1 win we give to all the node where player 1 played +1 on wins and +0 for else
+        for when player 2 win we follow the same logic
+
+        result = 2 if draw, =1 if 'X' won and =0 if 'O' won
+        logo quando result == node.game.turn vai dar reward 1 pois foi o jogador que ganhou a simulacao
+        '''
         while node != None:
-            if result == node.game.turn: #caso seja o turno do jogar que ganhou na simulacao 
+            if result == node.game.turn: #when the winner is the same as the last player on the curr node 
                 reward = 1
             else: reward = 0
             node.visited += 1
@@ -104,6 +149,10 @@ class MCTS:
 
 
     def best_move(self):
+        '''
+        after the search() we select the best child from the root with this funcion
+        we also print the win_rate for each child to visualize the data and the choise made from the algoritm
+        '''
         childs = self.root.childs
         node = childs[0][0]
         best_col = childs[0][1]
@@ -121,4 +170,5 @@ class MCTS:
         return best_col
     
     def statistic(self):
+        ''' returns the number of simulations and the run time for the search taken '''
         return self.simulations, self.run_time

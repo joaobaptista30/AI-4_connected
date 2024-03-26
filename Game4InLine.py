@@ -5,28 +5,39 @@ from copy import deepcopy
 
 class Game4InLine:
     def __init__ (self,row,col):
+        '''
+        initialize the game, board and all other components to be able to play
+        '''
         self.rows = row
         self.cols = col
-        self.board = [['-' for _ in range(col)] for _ in range(row)] #matrix representing the board
-        self.placed = [0 for _ in range(col)] #store the num of pieces per column
-        self.pieces = ['X','O']
-        self.turn = 0
-        self.round = 0
+        self.board = [['-' for _ in range(col)] for _ in range(row)] #matrix representing the board, initialized full with '-'
+        self.placed = [0 for _ in range(col)] #store the num of pieces per column, initialized with 0s
+        self.pieces = ['X','O'] # different pieces
+        self.turn = 0 # to know next player, switch between 0 and 1
+        self.round = 0 
 
 
     def legal_moves(self):
+        '''
+        returns a list with the columns that are possible to play,
+        this is, that are not full
+        '''
         legal=[]
 
         for i in range(self.cols):
-            if self.placed[i]<self.rows:
+            if self.placed[i]<self.rows: #placed[i]<rows means that the number of pieced placed in the row-i is less than the max pieced that are possible to place
                 legal.append(i)
         
         return legal
 
 
     def childs(self):
-        # returns the possible moves
-        moves=self.legal_moves()
+        '''
+        this funcion returns a list for the possible childs based on the current state of the board
+        the list is made of lists with the format -> [child: Game4InLine, col: int]
+        where child is the new game made from the current and played at the col selected
+        '''
+        moves=self.legal_moves() # returns the possible moves
         children = []
 
         for col in moves:
@@ -37,6 +48,13 @@ class Game4InLine:
 
 
     def play(self,col:int): #funcion to place pieces based on turn and column
+        '''
+        it is guaranteed that the col given is not full
+
+        given a col it will place the piece, X or O based on turn
+        the piece will be placed at the bottom of the column
+        and updated all the data regarding turn, round and placed[]
+        '''  
         self.board[self.rows-self.placed[col]-1][col]=self.pieces[self.turn]
         self.placed[col]+=1
         self.round+=1
@@ -44,7 +62,15 @@ class Game4InLine:
         return self
 
 
-    def isFinished(self,col): #return 2 if game is a draw, True if last move was a winning one , False to keep playing
+    def isFinished(self,col):
+        '''
+        return 2 if game is a draw, True if last move was a winning one , False to keep playing
+        (we return True for win and 2 for draw because 2!=True but "if isFinished()" will be considered true if the return is 2 and we use it for diferenciate from draw or win)
+
+        based on the game and the column played last we analyze if there is a sequence of 4(or more) of the same type of piece placed
+        we start at the position of the last played piece and check vertical, horizontal and both diagonals
+        if there is no sequence of 4(or more) but the board is full (when round == rows*cols) we return 2 for a draw
+        '''
         played = self.pieces[self.turn-1]
         row = self.rows - max(self.placed[col],1)
     
@@ -119,6 +145,22 @@ class Game4InLine:
 
 
     def heuristic_extra(game,col):
+        '''
+        this heuristic was made to make A* more defensive 
+        where it will prioritize not losing rather than getting max point from the given heuristic for the project
+
+        it gives points based on col played and the player turn
+        if it is a win move it will give -512 for O and 512 for X as the given heuristic
+        but if it has a chance to defend from a lose, for example: O played and he made a play that got a sequence of 3-X and 1-O
+        it will consider that it was a good defence move because it made impossible for the X to win next turn
+
+        the point are given as follow:
+        -500 for 3 Xs and 1 O and it is O turn
+        -100 for 2 Xs and 1 O and it is O turn
+        100 for 2 Os and 1 X and it is X turn
+        500 for 3 Os and 1 X and it is X turn
+        0 for else
+        '''
         row = game.rows-game.placed[col]
     
         #caso for uma jogada para ganhar
@@ -140,7 +182,7 @@ class Game4InLine:
                     count_O+=1
             
             #dar pontos
-            h_value = getPoints_path(game,count_X,count_O)
+            h_value = getPoints_extra(game,count_X,count_O)
             if abs(h_value) == 500:
                 return -500 if game.turn%2==0 else 500
             elif h_value != 0:
@@ -158,7 +200,7 @@ class Game4InLine:
                 count_O+=1
 
         #dar pontos
-        h_value = getPoints_path(game,count_X,count_O)
+        h_value = getPoints_extra(game,count_X,count_O)
         if abs(h_value) == 500:
             return -500 if game.turn%2==0 else 500
         elif h_value != 0:
@@ -184,7 +226,7 @@ class Game4InLine:
                 if (game.board[tmprow+h][tmpcol+h] == "O"):
                     count_O+=1
 
-            h_value = getPoints_path(game,count_X,count_O)
+            h_value = getPoints_extra(game,count_X,count_O)
             if abs(h_value) == 500:
                 return -500 if game.turn%2==0 else 500
             elif h_value != 0:
@@ -213,7 +255,7 @@ class Game4InLine:
                 if (game.board[tmprow-h][tmpcol+h] == "O"):
                     count_O+=1
 
-            h_value = getPoints_path(game,count_X,count_O)
+            h_value = getPoints_extra(game,count_X,count_O)
             if abs(h_value) == 500:
                 return -500 if game.turn%2==0 else 500
             elif h_value != 0:
@@ -228,8 +270,21 @@ class Game4InLine:
 
     def heuristic_points(game,col):
         '''
+        this is the given heuristic for the project, it takes col as an input but it doesn't use it, this happen because the other heuristic needs col
+        and we use a lambda funcion on our A* that takes the sum of both heuristisc
 
+        the point are given as follow:
+        -50 for three Os, no Xs,
+        -10 for two Os, no Xs,
+        - 1 for one O, no Xs,
+        0 for no tokens, or mixed Xs and Os,
+        1 for one X, no Os,
+        10 for two Xs, no Os,
+        50 for three Xs, no Os.
+
+        and depending on whose turn is to play (+16 for X, -16 for O)
         '''
+
         points = 16 if game.pieces[game.turn] == 'X' else -16
         #horizontal
         for i in range(game.rows):
@@ -304,26 +359,26 @@ class Game4InLine:
 
     def A_star(self,heuristic):
         '''
-        As in this project our A* only looks for its next best play without going in depht for a possible move from its the oponent
-        We will use a list to store (heuristic(child),col) and sort it so the best play for 'O' is first and for 'X' is last
-        A* will play as 'O' so the lower the score the best (due to our heuristic setup)
-        return the col from best child 
+        As in this project our A* only looks for its next best play without going in depht for a possible move from its the oponent we don't need to do a loop until the game is finished
+        We will use a list to store [heuristic(child),col] and sort it so the best play for 'O' is first and for 'X' is last
+        A* will play as 'O' when vs human, so the lower the score the best (due to our heuristic setup)
+        it returns the col from best child based on the turn
         '''
         childs=self.childs()
         points_col=[]  #points_col[k][0] = points | points_col[k][1] = col
-        a=[] #eliminar depois de debugg
+        points_given=[] #list to visualise the given points per heuristic and the column played. format-> list of lists = [[h_points,h_extra,col]]
         for i in range(len(childs)):
             col=childs[i][1]
             points_col.append([heuristic(state=(childs[i][0]),col=col),col])
             #para visualizar pontuacao de cada heuristica
-            a.append([Game4InLine.heuristic_points((childs[i][0]),col),Game4InLine.heuristic_extra((childs[i][0]),col),col+1]) #eliminar depois de debugg
+            points_given.append([Game4InLine.heuristic_points((childs[i][0]),col),Game4InLine.heuristic_extra((childs[i][0]),col),col+1])
 
-        points_col.sort() #lowest points first
+        points_col.sort() #order the list so that first is the lowest points in total and last the max points. !!*this doesn't mean the best play is last*!!
 
         #para visualizar pontuacao de cada heuristica
         print(f"h_dada, h_extra, col:")
-        for j in range(len(a)):
-            print(a[j])
+        for j in range(len(points_given)):
+            print(points_given[j])
         #para visualizar pontuacao de cada heuristica
 
         return (points_col[0][1]) if self.pieces[self.turn] == 'O' else (points_col[-1][1])
@@ -335,7 +390,9 @@ class Game4InLine:
 
 
 def getPoints(x,o):
-    
+    '''
+    returns the points based on the given heuristic for the project
+    '''
     if (x == 4 and o == 0):
         return 512
     if (x == 3 and o == 0):
@@ -354,7 +411,10 @@ def getPoints(x,o):
         return -512
     return 0
 
-def getPoints_path(game: Game4InLine, x, o):
+def getPoints_extra(game: Game4InLine, x, o):
+    '''
+    returns the points based on the extra heuristic setup
+    '''
     if(x==3 and o==1) and game.pieces[game.turn-1] == 'O':
         return -500
     if(x==2 and o==1) and game.pieces[game.turn-1] == 'O':

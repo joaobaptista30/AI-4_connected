@@ -105,19 +105,17 @@ class MCTS:
 
     def best_move(self):
         childs = self.root.childs
-        print(childs) #====================
         node = childs[0][0]
         best_col = childs[0][1]
         max_win_rate = node.wins/node.visited
-        print(f"win: {node.wins}\nvisited: {node.visited}")
-        print(f"win/visited: {max_win_rate} col: {best_col+1}")
+        print(f"win/visited: {max_win_rate:.4f} col: {best_col+1}")
 
         for i in range (1,len(childs)):
             node = childs[i][0]
-            print(f"win: {node.wins}\nvisited: {node.visited}")
-            print(f"win/visited: {node.wins/node.visited} col: {childs[i][1]+1}")
-            if max_win_rate < (node.wins/node.visited):
-                max_win_rate = (node.wins/node.visited)
+            max_win_rate_temp = node.wins/node.visited
+            print(f"win/visited: {max_win_rate_temp:.4f} col: {childs[i][1]+1}")
+            if max_win_rate < max_win_rate_temp:
+                max_win_rate = max_win_rate_temp
             
                 best_col = childs[i][1]
         return best_col

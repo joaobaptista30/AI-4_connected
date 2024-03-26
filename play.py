@@ -16,7 +16,6 @@ def result(game,col):
     return False
 
 
-
 def main(): #func for the game
     #in case user decides to play with a different board size from 6x7
     if BOARD_SIZE_STANDARD: game=G4Line(6,7)
@@ -24,7 +23,7 @@ def main(): #func for the game
         r,c=map(int,input("Min board size: 5x5\nBoard size: (rows,cols) ").split())
         if(r<=4 or c<=4): game=G4Line(6,7)
         else: game=G4Line(r,c) 
-    print(game)
+    print(f"Board:\n{game}")
     
     #if user want to play vs AI (and which AI, when MCTS is implemented)
     Ai_playing = input("Play with AI [y\\n]: ")
@@ -56,14 +55,12 @@ def main(): #func for the game
         if result(game,column_played):
             break
 
-        print(game.placed)
+
         #AI play
         if which_AI == 1: #A*
-            column_played=game.A_star(lambda state,col: G4Line.heuristic_points(state,col)+ G4Line.heuristic_path(state,col))
+            column_played=game.A_star(lambda state,col: G4Line.heuristic_points(state,col)+ G4Line.heuristic_extra(state,col))
             game.play(column_played)
-
             print(f"AI play: {column_played+1}")
-            print(f"Board:\n{game}")
 
 
         elif which_AI == 2: #MCTS
@@ -71,16 +68,35 @@ def main(): #func for the game
             tree.search(TIME_MCTS) 
             column_played = tree.best_move()
             n_simulations, run_time= tree.statistic()
-
             game.play(column_played)
             print(f"AI play: {column_played+1}")
             print(f"Num simulations = {n_simulations} in {run_time:.5f}seg")
-            print(game)
 
+
+        print(f"Board:\n{game}")
         if Ai_playing == 'y':
             if result(game,column_played):
                 break
 
+
+def main_A_star():
+    start_time = time.time()
+    game=G4Line(6,7)
+    #main loop
+    while True: 
+        time.sleep(0.5)       
+        print(f"AI {game.turn%2 +1} ('{game.pieces[game.turn%2]}') turn")
+        
+        #AI play 
+        column_played=game.A_star(lambda state,col: G4Line.heuristic_points(state,col)+ G4Line.heuristic_extra(state,col))
+        game.play(column_played)
+        print(f"AI play: {column_played+1}")
+        print(f"Board:\n{game}")
+
+        if result(game,column_played):
+            break
+
+    print(f"game took {(time.time()-start_time):.0f} seg and {game.round} rounds")
 
 
 def main_mcts():
@@ -88,7 +104,7 @@ def main_mcts():
     game=G4Line(6,7)
     #main loop
     while True:        
-        print(f"player {game.turn%2 +1} ('{game.pieces[game.turn%2]}') turn")
+        print(f"AI {game.turn%2 +1} ('{game.pieces[game.turn%2]}') turn")
         
         #AI play 
         tree = MCTS(game)
@@ -96,16 +112,23 @@ def main_mcts():
         column_played = tree.best_move()
         n_simulations, run_time= tree.statistic()
 
+        print(f"AI {game.turn%2 +1} play: {column_played+1}")
+        print(f"Num simulations = {n_simulations} in {run_time:.2f}seg")
         game.play(column_played)
-        print(f"AI play: {column_played+1}")
-        print(f"Num simulations = {n_simulations} in {run_time:.5f}seg")
-        print(game)
+        print(f"Board:\n{game}")
 
         if result(game,column_played):
             break
 
-    print(f"game took {time.time()-start_time} seg")
+    print(f"game took {(time.time()-start_time):.0f} seg and {game.round} rounds")
+
 
 
 if __name__ == "__main__":
-    main_mcts()
+    qual = int(input(f"Qual modo:\n1: Player vs AI ou PvP\n2: A* vs A*\n3: MCTS vs MCTS\nEscolha: "))
+    if qual == 1:
+        main()
+    elif qual == 2:
+        main_A_star()
+    elif qual == 3:    
+        main_mcts()

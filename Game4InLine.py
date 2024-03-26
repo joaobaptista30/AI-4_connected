@@ -118,7 +118,7 @@ class Game4InLine:
         return False
 
 
-    def heuristic_path(game,col):
+    def heuristic_extra(game,col):
         row = game.rows-game.placed[col]
     
         #caso for uma jogada para ganhar
@@ -140,7 +140,7 @@ class Game4InLine:
                     count_O+=1
             
             #dar pontos
-            h_value = getPoints_path(count_X,count_O)
+            h_value = getPoints_path(game,count_X,count_O)
             if abs(h_value) == 500:
                 return -500 if game.turn%2==0 else 500
             elif h_value != 0:
@@ -158,7 +158,7 @@ class Game4InLine:
                 count_O+=1
 
         #dar pontos
-        h_value = getPoints_path(count_X,count_O)
+        h_value = getPoints_path(game,count_X,count_O)
         if abs(h_value) == 500:
             return -500 if game.turn%2==0 else 500
         elif h_value != 0:
@@ -184,7 +184,7 @@ class Game4InLine:
                 if (game.board[tmprow+h][tmpcol+h] == "O"):
                     count_O+=1
 
-            h_value = getPoints_path(count_X,count_O)
+            h_value = getPoints_path(game,count_X,count_O)
             if abs(h_value) == 500:
                 return -500 if game.turn%2==0 else 500
             elif h_value != 0:
@@ -213,7 +213,7 @@ class Game4InLine:
                 if (game.board[tmprow-h][tmpcol+h] == "O"):
                     count_O+=1
 
-            h_value = getPoints_path(count_X,count_O)
+            h_value = getPoints_path(game,count_X,count_O)
             if abs(h_value) == 500:
                 return -500 if game.turn%2==0 else 500
             elif h_value != 0:
@@ -222,7 +222,7 @@ class Game4InLine:
             tmpcol+=1
             tmprow-=1 
     
-
+    
         return abs(points)*(-1) if game.turn%2==0 else abs(points)
 
 
@@ -316,12 +316,15 @@ class Game4InLine:
             col=childs[i][1]
             points_col.append([heuristic(state=(childs[i][0]),col=col),col])
             #para visualizar pontuacao de cada heuristica
-            a.append([Game4InLine.heuristic_points((childs[i][0]),col),Game4InLine.heuristic_path((childs[i][0]),col),col+1]) #eliminar depois de debugg
+            a.append([Game4InLine.heuristic_points((childs[i][0]),col),Game4InLine.heuristic_extra((childs[i][0]),col),col+1]) #eliminar depois de debugg
 
         points_col.sort() #lowest points first
 
         #para visualizar pontuacao de cada heuristica
-        print(f"h_dada, h_path, col:\n{a}")
+        print(f"h_dada, h_extra, col:")
+        for j in range(len(a)):
+            print(a[j])
+        #para visualizar pontuacao de cada heuristica
 
         return (points_col[0][1]) if self.pieces[self.turn] == 'O' else (points_col[-1][1])
 
@@ -351,17 +354,16 @@ def getPoints(x,o):
         return -512
     return 0
 
-def getPoints_path(x,o):
-    if(x==3 and o==1):
+def getPoints_path(game: Game4InLine, x, o):
+    if(x==3 and o==1) and game.pieces[game.turn-1] == 'O':
         return -500
-    if(x==2 and o==1):
+    if(x==2 and o==1) and game.pieces[game.turn-1] == 'O':
         return -100  
-    if(x==1 and o==3):
+    if(x==1 and o==3) and game.pieces[game.turn-1] == 'X':
         return 500
-    if(x==1 and o==2):
+    if(x==1 and o==2) and game.pieces[game.turn-1] == 'X':
         return 100 
     return 0
-
 
 def print_board(board): #transform the game board from matrix to a visual representation
     board_str="|"

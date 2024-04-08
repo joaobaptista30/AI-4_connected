@@ -137,15 +137,49 @@ def main_mcts():
 
     print(f"game took {(time.time()-start_time):.0f} seg and {game.round} rounds")
 
+def A_star_vs_MCTS(i):
+    start_time = time.time() #timer to know how long it takes
+    game=G4Line(6,7) #board is set to 'normal' size
+    #main loop
+    while True:     
+        #play 
+        if(game.turn %2 == i):
+            print(f"A* ('{game.pieces[game.turn%2]}') turn")
+            column_played=game.A_star(lambda state,col: G4Line.heuristic_points(state,col)+ G4Line.heuristic_extra(state,col))
+            game.play(column_played)
+            print(f"A* play: {column_played+1}")
+            print(f"Board:\n{game}")
+        else:
+            print(f"MCTS ('{game.pieces[game.turn%2]}') turn")
+            tree = MCTS(game)
+            tree.search(TIME_MCTS) 
+            column_played = tree.best_move()
+            n_simulations, run_time= tree.statistic()
+            game.play(column_played)
+            
+            print(f"MCTS play: {column_played+1}")
+            print(f"Board:\n{game}")
+            print(f"Num simulations = {n_simulations} in {run_time:.5f}seg")
+        
+
+        if result(game,column_played):
+            break
+
+    print(f"game took {(time.time()-start_time):.0f} seg and {game.round} rounds")
+
 
 if __name__ == "__main__":
     '''
     made so the user can choose what type of game he wants to play/watch
     '''
-    qual = int(input(f"Qual modo:\n1: Player vs AI ou PvP\n2: A* vs A*\n3: MCTS vs MCTS\nEscolha: "))
+    qual = int(input(f"Qual modo:\n1: Player vs AI ou PvP\n2: A* vs A*\n3: MCTS vs MCTS\n4: A* vs MCTS\n5: MCTS vs A*\nEscolha: "))
     if qual == 1:
         main()
     elif qual == 2:
         main_A_star()
     elif qual == 3:    
         main_mcts()
+    elif qual == 4:
+        A_star_vs_MCTS(0)
+    elif qual == 5:
+        A_star_vs_MCTS(1)

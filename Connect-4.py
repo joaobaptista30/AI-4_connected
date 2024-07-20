@@ -10,6 +10,7 @@ pg.display.set_caption("Connect-4")
 WIDTH, HEIGHT = 1200,850
 WINDOW = pg.display.set_mode((WIDTH,HEIGHT))
 FPS = 120
+TIME_MCTS = 5 #time for the MCTS algo to execute
 
 #fonts
 FONT = pg.font.SysFont("Brush Script MT Italic",90)
@@ -98,11 +99,11 @@ def start_menu():
                         pvp()
 
                     if B_pvia.collidepoint(mx,my):
-                        print("play PvIA")
+                        pvia()
+
 
         pg.display.update()
         clock.tick(FPS)
-
 
 
 def pvp():
@@ -177,6 +178,94 @@ def pvp():
                         game.play(col)
                         res_game = game.isFinished(col)
 
+
+        pg.display.update()
+        clock.tick(FPS)
+
+
+def pvia():
+    game = G4(6,7)
+    clock = pg.time.Clock()
+    score = [0,0]
+    B_menu = pg.Rect(14,359,185,198)
+    B_pl_ag = pg.Rect(525,455,250,125)
+    res_game = 0
+    ia_play = False
+
+    while True:
+        WINDOW.blit(BOARD_PVIA, (0,0))
+        draw_extras(game,score)
+    
+        if res_game:
+            if res_game == 2: # draw
+                WINDOW.blit(DRAW,(360,205))
+            else: #some1 win
+                score[game.turn-1] += 1
+                if game.turn: WINDOW.blit(P1,(360,205))
+                else: WINDOW.blit(IA,(360,205))
+            #update score view
+            pg.draw.rect(WINDOW, BLACK, pg.Rect(25,140,150,100))
+            text = FONT.render(f"{score[0]} - {score[1]}", True, WHITE)
+            WINDOW.blit(text, (25,140))
+            WINDOW.blit(PLAY_AGAIN,(525,455))
+            
+            #make a cicle to wait for a option (play again or go back to menu)
+            next_event = False
+            while not next_event:
+                mx,my = pg.mouse.get_pos()
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        pg.quit()
+                        sys.exit()
+
+                    if event.type == pg.KEYDOWN:
+                        if event.key == pg.K_ESCAPE:
+                            return
+                        
+                    if event.type == pg.MOUSEBUTTONDOWN:
+                        if event.button == 1:
+                            if B_menu.collidepoint(mx,my):
+                                return
+                            if B_pl_ag.collidepoint(mx,my):
+                                game = G4(6,7)
+                                next_event = True
+                                res_game = 0
+
+                pg.display.update()
+                clock.tick(FPS)
+
+
+        if ia_play:
+            tree = MCTS(game)
+            tree.search(TIME_MCTS) 
+            column = tree.best_move()
+            game.play(column)
+            res_game = game.isFinished(column)
+            ia_play = False
+
+        else:
+            mx,my = pg.mouse.get_pos()
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    sys.exit()
+
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        return
+                    
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if B_menu.collidepoint(mx,my):
+                            return
+
+                        col = column_played(mx,my)
+                        if col in game.legal_moves() and not ia_play:
+                            game.play(col)
+                            res_game = game.isFinished(col)
+                            ia_play = True
+                            WINDOW.blit(BOARD_PVIA, (0,0))
+                            draw_extras(game,score)
 
         pg.display.update()
         clock.tick(FPS)

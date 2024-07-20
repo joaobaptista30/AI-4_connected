@@ -27,6 +27,11 @@ DEF_BACK = pg.image.load(("assets/background.png"))
 BOARD_PVP = pg.image.load(("assets/GameBoard.png"))
 BOARD_PVIA = pg.image.load(("assets/GameBoardIA.png"))
 TO_PLAY = pg.image.load(("assets/playerToplay.png"))
+PLAY_AGAIN = pg.image.load(("assets/PlayAgain.png"))
+DRAW = pg.image.load(("assets/draw.png"))
+P1 = pg.image.load(("assets/winp1.png"))
+P2 = pg.image.load(("assets/winp2.png"))
+IA = pg.image.load(("assets/winIA.png"))
 
 
 #drawing func
@@ -105,6 +110,7 @@ def pvp():
     clock = pg.time.Clock()
     score = [0,0]
     B_menu = pg.Rect(14,359,185,198)
+    B_pl_ag = pg.Rect(525,455,250,125)
     res_game = 0
 
     while True:
@@ -114,20 +120,20 @@ def pvp():
         
         if res_game:
             if res_game == 2: # draw
-                #image to show draw
-                ...
-                
+                WINDOW.blit(DRAW,(360,205))
             else: #some1 win
                 score[game.turn-1] += 1
-                #image to show win
-
+                if game.turn: WINDOW.blit(P1,(360,205))
+                else: WINDOW.blit(P2,(360,205))
             #update score view
             pg.draw.rect(WINDOW, BLACK, pg.Rect(25,140,150,100))
-            img = FONT.render(f"{score[0]} - {score[1]}", True, WHITE)
-            WINDOW.blit(img, (25,140))
+            text = FONT.render(f"{score[0]} - {score[1]}", True, WHITE)
+            WINDOW.blit(text, (25,140))
+            WINDOW.blit(PLAY_AGAIN,(525,455))
             
             #make a cicle to wait for a option (play again or go back to menu)
-            while True:
+            next_event = False
+            while not next_event:
                 mx,my = pg.mouse.get_pos()
                 for event in pg.event.get():
                     if event.type == pg.QUIT:
@@ -142,7 +148,11 @@ def pvp():
                         if event.button == 1:
                             if B_menu.collidepoint(mx,my):
                                 return
-                            
+                            if B_pl_ag.collidepoint(mx,my):
+                                game = G4(6,7)
+                                next_event = True
+                                res_game = 0
+
                 pg.display.update()
                 clock.tick(FPS)
 

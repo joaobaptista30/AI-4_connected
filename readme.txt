@@ -1,5 +1,9 @@
 Files content:
 
+<Connect-4.py>
+	Graphic version to play. With the menus to start, rules and board
+	Can play PvP or PvIA (IA plays using MCTS algorithm limited to 5 seconds)
+
 <Game4InLine.py>
 	Game logic and A* implementation
 

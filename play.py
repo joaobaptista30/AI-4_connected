@@ -38,12 +38,13 @@ def main():
     Ai_playing = input("Play with AI [y\\n]: ")
     while Ai_playing!='y' and Ai_playing!='n':
         Ai_playing = input(f"Invalid choice\nPlay with AI [y\\n]: ")
+
     #and which AI [A* or MCTS]
     which_AI = 0
     if Ai_playing == "y":
-      which_AI = int(input("A*: 1    MCTS: 2\nChoose (1 or 2): "))
-    while which_AI != 1 and which_AI != 2:
-        which_AI = int(input("Invalid choice\nA*: 1    MCTS: 2\nChoose (1 or 2): "))
+        which_AI = int(input("A*: 1    MCTS: 2\nChoose (1 or 2): "))
+        while which_AI != 1 and which_AI != 2:
+            which_AI = int(input("Invalid choice\nA*: 1    MCTS: 2\nChoose (1 or 2): "))
     print("")
 
 

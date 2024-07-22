@@ -13,7 +13,7 @@ FPS = 120
 TIME_MCTS = 5 #time for the MCTS algo to execute
 
 #fonts
-FONT = pg.font.SysFont("Brush Script MT Italic",90)
+FONT = pg.font.SysFont("brushscriptitálico",90)
 
 
 #Colors
@@ -111,7 +111,7 @@ def pvp():
     clock = pg.time.Clock()
     score = [0,0]
     B_menu = pg.Rect(14,359,185,198)
-    B_pl_ag = pg.Rect(525,455,250,125)
+    B_pl_ag = pg.Rect(525,0,250,125)
     res_game = 0
 
     while True:
@@ -121,16 +121,16 @@ def pvp():
         
         if res_game:
             if res_game == 2: # draw
-                WINDOW.blit(DRAW,(360,205))
+                WINDOW.blit(DRAW,(0,240))
             else: #some1 win
                 score[game.turn-1] += 1
-                if game.turn: WINDOW.blit(P1,(360,205))
-                else: WINDOW.blit(P2,(360,205))
+                if game.turn: WINDOW.blit(P1,(0,240))
+                else: WINDOW.blit(P2,(0,240))
             #update score view
-            pg.draw.rect(WINDOW, BLACK, pg.Rect(25,140,150,100))
+            pg.draw.rect(WINDOW, BLACK, pg.Rect(0,140,215,100))
             text = FONT.render(f"{score[0]} - {score[1]}", True, WHITE)
             WINDOW.blit(text, (25,140))
-            WINDOW.blit(PLAY_AGAIN,(525,455))
+            WINDOW.blit(PLAY_AGAIN,(525,0))
             
             #make a cicle to wait for a option (play again or go back to menu)
             next_event = False
@@ -188,7 +188,7 @@ def pvia():
     clock = pg.time.Clock()
     score = [0,0]
     B_menu = pg.Rect(14,359,185,198)
-    B_pl_ag = pg.Rect(525,455,250,125)
+    B_pl_ag = pg.Rect(525,0,250,125)
     res_game = 0
     ia_play = False
 
@@ -198,16 +198,16 @@ def pvia():
     
         if res_game:
             if res_game == 2: # draw
-                WINDOW.blit(DRAW,(360,205))
+                WINDOW.blit(DRAW,(0,240))
             else: #some1 win
                 score[game.turn-1] += 1
-                if game.turn: WINDOW.blit(P1,(360,205))
-                else: WINDOW.blit(IA,(360,205))
+                if game.turn: WINDOW.blit(P1,(0,240))
+                else: WINDOW.blit(IA,(0,240))
             #update score view
-            pg.draw.rect(WINDOW, BLACK, pg.Rect(25,140,150,100))
+            pg.draw.rect(WINDOW, BLACK, pg.Rect(0,140,215,100))
             text = FONT.render(f"{score[0]} - {score[1]}", True, WHITE)
             WINDOW.blit(text, (25,140))
-            WINDOW.blit(PLAY_AGAIN,(525,455))
+            WINDOW.blit(PLAY_AGAIN,(525,0))
             
             #make a cicle to wait for a option (play again or go back to menu)
             next_event = False

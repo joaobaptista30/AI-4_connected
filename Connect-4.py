@@ -227,6 +227,7 @@ def pvia():
                             if B_menu.collidepoint(mx,my):
                                 return
                             if B_pl_ag.collidepoint(mx,my):
+                                ia_play = False
                                 game = G4(6,7)
                                 next_event = True
                                 res_game = 0

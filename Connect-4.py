@@ -1,6 +1,7 @@
 #Run a graphic version of the game instead off running in terminal
 import pygame as pg
 import sys
+import threading
 from Game4InLine import Game4InLine as G4
 from MCTS import MCTS 
 
@@ -36,14 +37,17 @@ IA = pg.image.load(("assets/winIA.png"))
 
 
 #drawing func
-def draw_extras(game: G4,score: list[int]):
+def draw_extras(game: G4, score: list[int], ai_thinking=False):
     #pieces on the board
     pieces = {"X":RC, "O":YC}
     for i in range(len(game.board)-1,-1,-1):
         for j in range(len(game.board[0])):
             if game.board[i][j] != "-":
                 WINDOW.blit(pieces[game.board[i][j]], (226+(125*j),95+(125*i)))
-    over_col(game)
+    
+    #only show hover effect if it's not AI's turn or AI is not thinking
+    if not ai_thinking:
+        over_col(game)
 
     #arrow to know player turn
     if game.turn:
@@ -54,6 +58,11 @@ def draw_extras(game: G4,score: list[int]):
     #score
     img = FONT.render(f"{score[0]} - {score[1]}", True, WHITE)
     WINDOW.blit(img, (25,140))
+
+    #show text when AI is thinking
+    if ai_thinking:
+        thinking_text = pg.font.SysFont("brushscriptitálico", 40).render("IA Thinking...", True, WHITE)
+        WINDOW.blit(thinking_text, (580, 20))
 
 
 def over_col(game: G4):
@@ -183,6 +192,15 @@ def pvp():
         clock.tick(FPS)
 
 
+def ai_calculate_move(game, result_container):
+    """Function to run AI calculation in separate thread"""
+    tree = MCTS(game)
+    tree.search(TIME_MCTS) 
+    column = tree.best_move()
+    result_container['column'] = column
+    result_container['finished'] = True
+
+
 def pvia():
     game = G4(6,7)
     clock = pg.time.Clock()
@@ -190,11 +208,13 @@ def pvia():
     B_menu = pg.Rect(14,359,185,198)
     B_pl_ag = pg.Rect(525,0,250,125)
     res_game = 0
-    ia_play = False
+    ai_thinking = False
+    ai_thread = None
+    ai_result = {}
 
     while True:
         WINDOW.blit(BOARD_PVIA, (0,0))
-        draw_extras(game,score)
+        draw_extras(game, score, ai_thinking)
     
         if res_game:
             if res_game == 2: # draw
@@ -227,7 +247,9 @@ def pvia():
                             if B_menu.collidepoint(mx,my):
                                 return
                             if B_pl_ag.collidepoint(mx,my):
-                                ia_play = False
+                                ai_thinking = False
+                                ai_thread = None
+                                ai_result = {}
                                 game = G4(6,7)
                                 next_event = True
                                 res_game = 0
@@ -235,38 +257,44 @@ def pvia():
                 pg.display.update()
                 clock.tick(FPS)
 
+        #check if it's AI's turn and we need to start thinking
+        if game.turn == 1 and not ai_thinking and not res_game:  # AI is player 1 (O)
+            ai_thinking = True
+            ai_result = {'finished': False, 'column': None}
+            ai_thread = threading.Thread(target=ai_calculate_move, args=(game, ai_result))
+            ai_thread.daemon = True
+            ai_thread.start()
 
-        if ia_play:
-            tree = MCTS(game)
-            tree.search(TIME_MCTS) 
-            column = tree.best_move()
+        # Check if AI has finished thinking
+        if ai_thinking and ai_result.get('finished', False):
+            column = ai_result['column']
             game.play(column)
             res_game = game.isFinished(column)
-            ia_play = False
+            ai_thinking = False
+            ai_thread = None
+            ai_result = {}
 
-        else:
-            mx,my = pg.mouse.get_pos()
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    pg.quit()
-                    sys.exit()
+        mx, my = pg.mouse.get_pos()
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
 
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_ESCAPE:
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    return
+                
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    if B_menu.collidepoint(mx,my):
                         return
-                    
-                if event.type == pg.MOUSEBUTTONDOWN:
-                    if event.button == 1:
-                        if B_menu.collidepoint(mx,my):
-                            return
 
+                    #player moves only when it's is turn and AI is not thinking
+                    if game.turn == 0 and not ai_thinking:
                         col = column_played(mx,my)
-                        if col in game.legal_moves() and not ia_play:
+                        if col in game.legal_moves():
                             game.play(col)
                             res_game = game.isFinished(col)
-                            ia_play = True
-                            WINDOW.blit(BOARD_PVIA, (0,0))
-                            draw_extras(game,score)
 
         pg.display.update()
         clock.tick(FPS)

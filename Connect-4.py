@@ -27,13 +27,13 @@ RC = pg.image.load(("assets/coin-red.png"))
 YC = pg.image.load(("assets/coin-yellow.png"))
 DEF_BACK = pg.image.load(("assets/background.png"))
 BOARD_PVP = pg.image.load(("assets/GameBoard.png"))
-BOARD_PVIA = pg.image.load(("assets/GameBoardIA.png"))
+BOARD_PVAI = pg.image.load(("assets/GameBoardAI.png"))
 TO_PLAY = pg.image.load(("assets/playerToplay.png"))
 PLAY_AGAIN = pg.image.load(("assets/PlayAgain.png"))
 DRAW = pg.image.load(("assets/draw.png"))
 P1 = pg.image.load(("assets/winp1.png"))
 P2 = pg.image.load(("assets/winp2.png"))
-IA = pg.image.load(("assets/winIA.png"))
+AI = pg.image.load(("assets/winAI.png"))
 
 
 #drawing func
@@ -61,7 +61,7 @@ def draw_extras(game: G4, score: list[int], ai_thinking=False):
 
     #show text when AI is thinking
     if ai_thinking:
-        thinking_text = pg.font.SysFont("brushscriptitálico", 40).render("IA Thinking...", True, WHITE)
+        thinking_text = pg.font.SysFont("brushscriptitálico", 40).render("AI Thinking...", True, WHITE)
         WINDOW.blit(thinking_text, (580, 20))
 
 
@@ -91,7 +91,7 @@ def over_col(game: G4):
 def start_menu():
     clock = pg.time.Clock()
     B_pvp = pg.Rect(60,510,500,300)
-    B_pvia = pg.Rect(640,510,500,300)
+    B_PvAI = pg.Rect(640,510,500,300)
 
     while True:
         WINDOW.blit(DEF_BACK, (0,0))
@@ -107,8 +107,8 @@ def start_menu():
                     if B_pvp.collidepoint(mx,my):
                         pvp()
 
-                    if B_pvia.collidepoint(mx,my):
-                        pvia()
+                    if B_PvAI.collidepoint(mx,my):
+                        pvai()
 
 
         pg.display.update()
@@ -201,7 +201,7 @@ def ai_calculate_move(game, result_container):
     result_container['finished'] = True
 
 
-def pvia():
+def pvai():
     game = G4(6,7)
     clock = pg.time.Clock()
     score = [0,0]
@@ -213,7 +213,7 @@ def pvia():
     ai_result = {}
 
     while True:
-        WINDOW.blit(BOARD_PVIA, (0,0))
+        WINDOW.blit(BOARD_PVAI, (0,0))
         draw_extras(game, score, ai_thinking)
     
         if res_game:
@@ -222,7 +222,7 @@ def pvia():
             else: #some1 win
                 score[game.turn-1] += 1
                 if game.turn: WINDOW.blit(P1,(0,240))
-                else: WINDOW.blit(IA,(0,240))
+                else: WINDOW.blit(AI,(0,240))
             #update score view
             pg.draw.rect(WINDOW, BLACK, pg.Rect(0,140,215,100))
             text = FONT.render(f"{score[0]} - {score[1]}", True, WHITE)

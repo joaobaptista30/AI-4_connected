@@ -20,10 +20,10 @@ def result(game,col):
 
 def main(): 
     ''' 
-    funcao para jogar Player vs Player | ou | Player vs IA
+    funcao para jogar Player vs Player | ou | Player vs AI
     permite configurar uma board diferente do 'normal' definido caso BOARD_SIZE_STANDARD = False sendo a board minima de 5x5
-    recebe um input y/n para saber se vai ser jogado contra IA e qual IA (A* ou MCTS)
-    no main loop corremos o jogo, onde decidimos qual coluna jogar (column_played) por input (players) ou decisao dos algoritmos (IA)
+    recebe um input y/n para saber se vai ser jogado contra AI e qual AI (A* ou MCTS)
+    no main loop corremos o jogo, onde decidimos qual coluna jogar (column_played) por input (players) ou decisao dos algoritmos (AI)
     loop acaba quando alguem ganhar ou empatar
     '''
     #in case user decides to play with a different board size from 6x7

@@ -78,7 +78,7 @@ def main():
             elif which_AI == 2: #MCTS
                 tree = MCTS(game)
                 tree.search(TIME_MCTS) 
-                column_played = tree.best_move()
+                column_played = tree.best_move(verbose=True)
                 n_simulations, run_time= tree.statistic()
                 game.play(column_played)
                 print(f"AI play: {column_played+1}")
@@ -125,7 +125,7 @@ def main_mcts():
         #AI play 
         tree = MCTS(game)
         tree.search(TIME_MCTS) 
-        column_played = tree.best_move()
+        column_played = tree.best_move(verbose=True)
         n_simulations, run_time= tree.statistic()
 
         print(f"AI {game.turn%2 +1} play: {column_played+1}")
@@ -154,7 +154,7 @@ def A_star_vs_MCTS(i):
             print(f"MCTS ('{game.pieces[game.turn%2]}') turn")
             tree = MCTS(game)
             tree.search(TIME_MCTS) 
-            column_played = tree.best_move()
+            column_played = tree.best_move(verbose=True)
             n_simulations, run_time= tree.statistic()
             game.play(column_played)
             

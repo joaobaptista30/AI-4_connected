@@ -1,4 +1,4 @@
-# Connect 4 with MCTS and Graphical UI
+# Connect 4 with Monte Carlo Tree Search
 
 ## 🎯 Project Overview
 This project implements the classic **Connect 4 game**, with:
@@ -57,7 +57,7 @@ pip install -r requirements.txt
 # Run the game with UI:
 python Connect-4.py
 
-# Run on terminal for better understanding of AI:
+# Run on terminal to view AI thoughts at each turn:
 python play.py
 ```
 

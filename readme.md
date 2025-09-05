@@ -25,7 +25,7 @@ This process balances **exploration** (trying new moves) and **exploitation** (c
 ## 📂Files content:
 
 **< Connect-4.py >**  
-&nbsp;&nbsp;&nbsp;&nbsp;Graphic version to play. With the menus to start, rules and board  
+&nbsp;&nbsp;&nbsp;&nbsp;Graphic version to play  
 &nbsp;&nbsp;&nbsp;&nbsp;Can play PvP or PvAI (AI plays using MCTS algorithm limited to 5 seconds)  
 
 **< Game4InLine.py >**  
@@ -46,8 +46,8 @@ This process balances **exploration** (trying new moves) and **exploitation** (c
 
 ## 🛠️ Installation & Setup
 
-Clone the repository:
 ```bash
+Clone the repository:
 git clone https://github.com/joaobaptista30/AI-4_connected.git
 cd AI-4_connected
 
